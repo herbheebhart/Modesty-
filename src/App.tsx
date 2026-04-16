@@ -9,6 +9,7 @@ import { Shop } from './pages/Shop';
 import { ProductDetails } from './pages/ProductDetails';
 import { About } from './pages/About';
 import { Contact } from './pages/Contact';
+import { Wishlist } from './pages/Wishlist';
 import { AdminLogin } from './pages/AdminLogin';
 import { AdminDashboard } from './pages/AdminDashboard';
 
@@ -26,6 +27,7 @@ const AppContent = () => {
           <Route path="/product/:id" element={<ProductDetails />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
         </Routes>

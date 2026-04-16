@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { MessageCircle, ChevronRight, Star, ShieldCheck, Truck, RotateCcw } from 'lucide-react';
+import { MessageCircle, ChevronRight, Star, ShieldCheck, Truck, RotateCcw, Heart } from 'lucide-react';
 import { motion } from 'motion/react';
 import { db } from '../lib/db';
 import { Product } from '../types';
 import { WHATSAPP_NUMBER } from '../constants';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
+import { toast } from 'sonner';
 
 export const ProductDetails = () => {
   const { id } = useParams();
@@ -14,6 +15,7 @@ export const ProductDetails = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
+  const [isInWishlist, setIsInWishlist] = useState(false);
 
   useEffect(() => {
     const p = db.getProducts().find(p => p.id === id);
@@ -21,6 +23,7 @@ export const ProductDetails = () => {
       setProduct(p);
       setSelectedSize(p.sizes[0]);
       setSelectedColor(p.colors[0]);
+      setIsInWishlist(db.isInWishlist(p.id));
     } else {
       navigate('/shop');
     }
@@ -46,6 +49,16 @@ export const ProductDetails = () => {
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
   };
 
+  const toggleWishlist = () => {
+    const result = db.toggleWishlist(product.id);
+    setIsInWishlist(result);
+    if (result) {
+      toast.success(`${product.name} added to wishlist`);
+    } else {
+      toast.info(`${product.name} removed from wishlist`);
+    }
+  };
+
   return (
     <div className="pt-32 pb-24 bg-background">
       <div className="container mx-auto px-4">
@@ -65,13 +78,19 @@ export const ProductDetails = () => {
             animate={{ opacity: 1, x: 0 }}
             className="space-y-4"
           >
-            <div className="aspect-[3/4] rounded-2xl overflow-hidden luxury-shadow">
+            <div className="aspect-[3/4] rounded-2xl overflow-hidden luxury-shadow relative">
               <img
                 src={product.image}
                 alt={product.name}
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"
               />
+              <button 
+                onClick={toggleWishlist}
+                className={`absolute top-6 right-6 p-3 rounded-full shadow-lg transition-all duration-300 z-10 ${isInWishlist ? 'bg-brand-gold text-white' : 'bg-white/80 text-brand-gold-dark hover:bg-brand-gold hover:text-white'}`}
+              >
+                <Heart className={`w-6 h-6 ${isInWishlist ? 'fill-current' : ''}`} />
+              </button>
             </div>
           </motion.div>
 
@@ -82,9 +101,11 @@ export const ProductDetails = () => {
             className="flex flex-col"
           >
             <div className="mb-8">
-              <Badge variant="outline" className="border-brand-gold text-brand-gold-dark mb-4 px-4 py-1 rounded-full uppercase tracking-widest text-[10px]">
-                {product.category}
-              </Badge>
+              <div className="flex justify-between items-start mb-4">
+                <Badge variant="outline" className="border-brand-gold text-brand-gold-dark px-4 py-1 rounded-full uppercase tracking-widest text-[10px]">
+                  {product.category}
+                </Badge>
+              </div>
               <h1 className="text-4xl md:text-5xl font-serif mb-4">{product.name}</h1>
               <p className="text-2xl font-medium text-foreground">₦{product.price.toLocaleString()}</p>
             </div>

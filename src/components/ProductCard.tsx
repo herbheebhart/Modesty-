@@ -1,17 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { MessageCircle, ShoppingBag } from 'lucide-react';
+import { MessageCircle, ShoppingBag, Heart } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Product } from '../types';
 import { WHATSAPP_NUMBER } from '../constants';
 import { Button } from './ui/button';
 import { db } from '../lib/db';
+import { toast } from 'sonner';
 
 interface ProductCardProps {
   product: Product;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+  const [isInWishlist, setIsInWishlist] = useState(db.isInWishlist(product.id));
+
   const handleWhatsAppOrder = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -25,6 +28,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
     const message = encodeURIComponent(`Hello! I want to order ${product.name}\nPrice: ₦${product.price.toLocaleString()}`);
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
+  };
+
+  const toggleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const result = db.toggleWishlist(product.id);
+    setIsInWishlist(result);
+    if (result) {
+      toast.success(`${product.name} added to wishlist`);
+    } else {
+      toast.info(`${product.name} removed from wishlist`);
+    }
   };
 
   return (
@@ -48,6 +63,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               New Arrival
             </div>
           )}
+          
+          <button 
+            onClick={toggleWishlist}
+            className={`absolute top-4 right-4 p-2 rounded-full transition-all duration-300 z-10 ${isInWishlist ? 'bg-brand-gold text-white' : 'bg-white/80 text-brand-gold-dark hover:bg-brand-gold hover:text-white'}`}
+          >
+            <Heart className={`w-4 h-4 ${isInWishlist ? 'fill-current' : ''}`} />
+          </button>
+
           <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
             <Button 
               onClick={handleWhatsAppOrder}

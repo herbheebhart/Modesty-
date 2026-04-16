@@ -3,6 +3,7 @@ import { INITIAL_PRODUCTS } from "../constants";
 
 const PRODUCTS_KEY = 'modestbyhabby_products';
 const ORDERS_KEY = 'modestbyhabby_orders';
+const WISHLIST_KEY = 'modestbyhabby_wishlist';
 
 export const db = {
   getProducts: (): Product[] => {
@@ -62,5 +63,26 @@ export const db = {
     const orders = db.getOrders();
     const filtered = orders.filter(o => o.id !== id);
     localStorage.setItem(ORDERS_KEY, JSON.stringify(filtered));
+  },
+
+  getWishlist: (): string[] => {
+    const stored = localStorage.getItem(WISHLIST_KEY);
+    return stored ? JSON.parse(stored) : [];
+  },
+
+  toggleWishlist: (productId: string) => {
+    const wishlist = db.getWishlist();
+    const index = wishlist.indexOf(productId);
+    if (index > -1) {
+      wishlist.splice(index, 1);
+    } else {
+      wishlist.push(productId);
+    }
+    localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlist));
+    return wishlist.includes(productId);
+  },
+
+  isInWishlist: (productId: string): boolean => {
+    return db.getWishlist().includes(productId);
   }
 };

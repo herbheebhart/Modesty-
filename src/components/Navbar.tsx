@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ShoppingBag, Menu, X, User } from 'lucide-react';
+import { ShoppingBag, Menu, X, User, Heart } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { BRAND_NAME } from '../constants';
 import { Button } from './ui/button';
@@ -41,11 +41,18 @@ export const Navbar = () => {
               {link.name}
             </Link>
           ))}
-          <Link to="/admin">
-            <Button variant="ghost" size="icon" className="hover:text-brand-gold">
-              <User className="w-5 h-5" />
-            </Button>
-          </Link>
+          <div className="flex items-center space-x-2">
+            <Link to="/wishlist">
+              <Button variant="ghost" size="icon" className={`hover:text-brand-gold ${location.pathname === '/wishlist' ? 'text-brand-gold' : ''}`}>
+                <Heart className="w-5 h-5" />
+              </Button>
+            </Link>
+            <Link to="/admin">
+              <Button variant="ghost" size="icon" className="hover:text-brand-gold">
+                <User className="w-5 h-5" />
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {/* Mobile Menu Toggle */}
@@ -74,6 +81,9 @@ export const Navbar = () => {
                   {link.name}
                 </Link>
               ))}
+              <Link to="/wishlist" onClick={() => setIsOpen(false)} className={`text-lg font-serif tracking-widest uppercase flex items-center gap-2 ${location.pathname === '/wishlist' ? 'text-brand-gold' : 'text-foreground'}`}>
+                <Heart className="w-5 h-5" /> Wishlist
+              </Link>
               <Link to="/admin" onClick={() => setIsOpen(false)} className="text-lg font-serif tracking-widest uppercase flex items-center gap-2">
                 <User className="w-5 h-5" /> Admin
               </Link>
